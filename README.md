@@ -21,16 +21,17 @@ G1R0C3 : 	Mise en forme de la sortie HTML(email) le 18/11/2015 (AT)
 -----------------------------------------------------------------------------	
 
 
-== Caractéristiques du script ==
-Type: Script Bladelogic Type 1
+#Caractéristiques du script 
+
+Type: Script Bladelogic Type 1  
 Compatibilité : tout systèmes Unix (AIX, Solaris, Linux)
 
 #Les étapes d’exécutions
 -	Récupération des paramètres 
 -	Lecture du fichier contenant les users applicatifs et système
 -	Pour chacun des users
-•	Vérification de son existence ou non  sur le host cible et passage au user suivant si non
-•	Vérification de l’état du compte et du password, stocke l’information dans un fichier si l’un des deux est expiré ou en voie d’expiration
+	•	Vérification de son existence ou non  sur le host cible et passage au user suivant si non
+	•	Vérification de l’état du compte et du password, stocke l’information dans un fichier si l’un des deux est expiré ou en voie d’expiration
 -	A la fin des vérifications, envoie un mail au support si au moins un compte ou password est expiré ou en voie d’expiration.
 
 NB : un compte ou un mot de passe est considéré comme étant en voie d’expiration lorsqu’il arrive à expiration des moins de 40 jours
