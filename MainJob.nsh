@@ -1,22 +1,22 @@
 #!/bin/nsh
 # Header_start
 #################################################################################
-#																				#
-#	Script de verification de la date d'expiration des comptes Unix				#
-#	Ce script s execute sur un serveur et n'envoie un mail au support que si	#
-#	au moins un des comptes listés dans le fichier UserList.txt ou leur mot		#
-#   de passe est expiré ou en voie d'expiration.            					#
+#										#
+#   Script de verification de la date d'expiration des comptes Unix		#
+#   Ce script s execute sur un serveur et n'envoie un mail au support que si	#
+#   au moins un des comptes listés dans le fichier UserList.txt ou leur mot	#
+#   de passe est expiré ou en voie d'expiration.            			#
 # ----------------------------------------------------------------------------- #
-# 	Author: Alfred TCHONDJO - DCB SM3P											#
-# 	Date: 2015-10-30															#
+#   Author: Alfred TCHONDJO - Iriven France					#
+#   Date: 2015-10-30								#
 # ----------------------------------------------------------------------------- #
-# Revisions																		#
-#																				#
-#	G1R0C0 : 	Creation du script le 30/10/2015 (AT)							#
-#	G1R0C1 : 	Amelioration des expressions regulires le 10/11/2015 (AT)		#
-#	G1R0C2 : 	Prise en charge toute version AIX le 16/11/2015 (AT)			#
-#	G1R0C3 : 	Mise en forme de la sortie HTML(email) le 18/11/2015 (AT)		#
-#																				#
+#   Revisions									#
+#										#
+#   G1R0C0 : 	Creation du script le 30/10/2015 (AT)				#
+#   G1R0C1 : 	Amelioration des expressions regulires le 10/11/2015 (AT)	#
+#   G1R0C2 : 	Prise en charge toute version AIX le 16/11/2015 (AT)		#
+#   G1R0C3 : 	Mise en forme de la sortie HTML(email) le 18/11/2015 (AT)	#
+#										#
 #################################################################################
 # Header_end
 # set -x
@@ -30,9 +30,8 @@ REPO_ENDPOINT="//${REPO_SERVER}${REPO_FILE_PATH}"
 MAIL_SERVER="$4"
 MAIL_RECIPIENT="$5"
 MAIL_FROM="server.expertunix@mydomain.com"
-POLE="$6"
 CURRDATE=`date '+%C%y%m%d'`
-MAIL_FILE_PATH="/var/tmp/AUDIT_COMPTES_${POLE}_${SERVER}_${CURRDATE}.html"
+MAIL_FILE_PATH="/var/tmp/AUDIT_COMPTES_${SERVER}_${CURRDATE}.html"
 MAIL_FILE_ENDPOINT="//${MAIL_SERVER}${MAIL_FILE_PATH}"
 PASSWORD_CHG_PATTERN="Last"
 PASSWORD_EXPIRE_PATTERN="expires"
@@ -243,7 +242,7 @@ do
 		echo "Mime-Version: 1.0" >> ${MAIL_FILE_ENDPOINT}
 		echo "Content-Type: text/html; charset=utf-8" >> ${MAIL_FILE_ENDPOINT}
 		echo "<br><br>" >> ${MAIL_FILE_ENDPOINT}
-		fileHasHostname "[-]" || echo "[-] SERVEUR: ${SERVER} - Pôle/EDS: ${POLE}<br><br>" >> ${MAIL_FILE_ENDPOINT}
+		fileHasHostname "[-]" || echo "[-] SERVEUR: ${SERVER} <br><br>" >> ${MAIL_FILE_ENDPOINT}
 	fi
 	MSG=""
 	if isTimelessItem "${ACCOUNTEXPIRE}"; then #seul le mot de passe peut expirer
