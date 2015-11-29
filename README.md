@@ -1,4 +1,4 @@
-# NSH-SCRIPT-Account-Expiration-Notifier
+# NSH-SCRIPT: Account Expiration Notifier
 
 Script de verification de la date d'expiration des comptes Unix. Ce script s execute 
 sur un serveur et n'envoie un mail au support que si au moins un des comptes listés 
