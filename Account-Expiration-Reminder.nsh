@@ -82,23 +82,23 @@ case "$ostype" in
 	  'AIX')
 	  	lastupdate=`nexec ${SERVER} "pwdadm -q $username"|grep -i "lastupdate"| awk -F'=' '{print $2}'`
 		maxage=`nexec ${SERVER} "lsuser -a maxage $username"|awk -F'=' '{print $2}'`
-		maxage_sec=`expr $maxage \* 604800`
-		maxage_days=`expr $maxage \* 7`
-		maxexpired=`nexec ${SERVER} "lsuser -a maxexpired $username"|awk -F'=' '{print $2}'`
-		account_locked=`nexec ${SERVER} "lsuser -a account_locked $username"|awk -F'=' '{print $2}'`
-		expire=`echo $((lastupdate + maxage_sec))`
 		if [ "$pattern" = "${PASSWORD_CHG_PATTERN}" ]; then
 		output=`echo $(perl -e 'print scalar(localtime(${lastupdate})), "\n"')`
 		elif [ "$pattern" = "${PASSWORD_EXPIRE_PATTERN}" ]; then
 			if [ "${maxage}" -eq 0 ]; then
 				output=`echo ${TIMELESS_PATTERN}`
 			else
-				output=`echo $(perl -e 'print scalar(localtime(${expire})), "\n"')`
+				maxage_sec=`expr $maxage \* 604800`
+				pwd_expire=`echo $((lastupdate + maxage_sec))`
+				output=`echo $(perl -e 'print scalar(localtime(${pwd_expire})), "\n"')`
 			fi
 		elif [ "$pattern" = "${PASSWORD_LIFETIME_PATTERN}" ]; then
+			maxage_days=`expr $maxage \* 7`
 			output=`echo ${maxage_days}`
 		elif [ "$pattern" = "${ACCOUNT_EXPIRE_PATTERN}" ]; then
-			if [ "${account_locked}" = "false" -a "${maxexpired}" -eq 0 ]; then
+			expire=`nexec ${SERVER} "lsuser -a expires $username"|awk -F'=' '{print $2}'`
+			account_locked=`nexec ${SERVER} "lsuser -a account_locked $username"|awk -F'=' '{print $2}'`
+			if [ "${account_locked}" = "false" -a "${expire}" -eq 0 ]; then
 				output=`echo ${TIMELESS_PATTERN}`
 			else
 				output=`echo $(perl -e 'print scalar(localtime(${expire})), "\n"')`
@@ -108,7 +108,42 @@ case "$ostype" in
 	  			exit 1 
 		fi
 		;;
-	  *) output=`nexec ${SERVER} "chage -l ${username}" |grep -i ${pattern} | head -n 1 | awk -F':' '{print $2}'` ;;
+	'HP-UX') 
+	  	lastupdate=`nexec ${SERVER} "getprpw -l -r -m spwchg $username"`
+		lastupdate_sec=$(date --date="${lastupdate}" +%s)
+if [ "$pattern" = "${PASSWORD_CHG_PATTERN}" ]; then
+	if [ -z "${lastupdate}" -o "${lastupdate}" -eq -1 ]; then
+		output=`echo ${TIMELESS_PATTERN}`
+	else
+		output=`echo $(perl -e 'print scalar(localtime(${lastupdate})), "\n"')`
+	fi
+elif [ "$pattern" = "${PASSWORD_EXPIRE_PATTERN}" ]; then
+	pwd_expire=`nexec ${SERVER} "getprpw -l -r -m exptm $username"`
+	if [  -z "${pwd_expire}" -o "${pwd_expire}" -eq -1 ]; then
+		output=`echo ${TIMELESS_PATTERN}`
+	else
+		pwd_maxage=`nexec ${SERVER} "getprpw -l -r -m lftm $username"`
+		pwd_maxage_sec=`expr $pwd_maxage \* 86400`
+		pwd_expire_date=`echo $((lastupdate_sec + pwd_maxage_sec))`
+		output=`echo $(perl -e 'print scalar(localtime(${pwd_expire_date})), "\n"')`
+	fi
+elif [ "$pattern" = "${PASSWORD_LIFETIME_PATTERN}" ]; then
+	output=`echo $(nexec ${SERVER} "getprpw -l -r -m exptm $username")`
+elif [ "$pattern" = "${ACCOUNT_EXPIRE_PATTERN}" ]; then
+		acc_expire=`nexec ${SERVER} "getprpw -l -r -m acctexp $username"`
+	if [ -z "${expire}" -o "${expire}" -eq -1 ]; then
+		output=`echo ${TIMELESS_PATTERN}`
+	else
+		maxage_sec=`expr $acc_expire \* 86400`
+		expire_sec=`echo $((lastupdate_sec + maxage_sec))`
+		output=`echo $(perl -e 'print scalar(localtime(${expire_sec})), "\n"')`
+	fi
+else
+echo "${SERVER} - $username : invalid user info value ($pattern)"
+		exit 1 
+fi	
+	;;
+	*) output=`nexec ${SERVER} "chage -l ${username}" |grep -i ${pattern} | head -n 1 | awk -F':' '{print $2}'` ;;
 	esac
 echo "${output}"
 }
@@ -155,7 +190,7 @@ local true=0
 local false=1
 local type=`echo $(getOSType $server)`
 case "$type" in
-  LINUX|SOLARIS|AIX)  return $true;;
+  LINUX|SOLARIS|AIX|HP-UX)  return $true;;
   *)    return $false ;;
 esac
 }
