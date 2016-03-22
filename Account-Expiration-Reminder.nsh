@@ -198,8 +198,12 @@ function fileHasHostname(){
 local server="$1"
 local true=0
 local false=1
-assertion=`nexec ${MAIL_SERVER} "cat ${MAIL_FILE_PATH}"|grep "\<${server}\>"`
-[ ! -z "$name" ] && return $true || return $false
+local ostype=`echo $(getOSType ${MAIL_SERVER})`
+case "$ostype" in
+	  'AIX') local assertion=`nexec ${MAIL_SERVER} "cat ${MAIL_FILE_PATH}" | grep -iw "${server}"` ;;
+	  *)  local assertion=`nexec ${MAIL_SERVER} "cat ${MAIL_FILE_PATH}"|grep -i "\<${server}\>"`
+	esac
+[ ! -z "${assertion}" ] && return $true || return $false
 }
 function userNotExistsOnHost(){
 local server="$1"
