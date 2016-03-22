@@ -327,8 +327,6 @@ done
 # ENVOI DU MAIL AU SUPPORT #
 ############################
 if [ -f ${MAIL_FILE_ENDPOINT} ] ; then
-	nexec "${MAIL_SERVER}" "/usr/sbin/sendmail -t < ${MAIL_FILE_PATH}"
-	nexec "${MAIL_SERVER}" "wait"
-	nexec "${MAIL_SERVER}" "rm -f ${MAIL_FILE_PATH}"	
+	nexec "${MAIL_SERVER}" "/usr/sbin/sendmail -t < ${MAIL_FILE_PATH};wait;rm -f ${MAIL_FILE_PATH}"
 fi
 exit 0
