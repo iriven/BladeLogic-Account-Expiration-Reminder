@@ -1,5 +1,7 @@
 # NSH-SCRIPT: Account Expiration Reminder
 
+[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=XDCFPNTKUC4TU)
+
 Script de verification de la date d'expiration des comptes Unix. Ce script s execute 
 sur un serveur et n'envoie un mail au support que si au moins un des comptes listés 
 dans le fichier UserList.txt ou leur mot de passe est expiré ou en voie d'expiration.   
